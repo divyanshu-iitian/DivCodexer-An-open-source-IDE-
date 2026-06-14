@@ -1,0 +1,133 @@
+@import "tailwindcss";
+
+@theme {
+  /* Base colors */
+  --color-bg-base: oklch(0.08 0.02 280);
+  --color-bg-surface: oklch(0.11 0.02 280);
+  --color-bg-elevated: oklch(0.14 0.025 280);
+  --color-bg-input: oklch(0.16 0.025 280);
+
+  /* Purple neon accent */
+  --color-neon: oklch(0.65 0.28 290);
+  --color-neon-dim: oklch(0.65 0.28 290 / 60%);
+  --color-neon-subtle: oklch(0.65 0.28 290 / 15%);
+  --color-neon-border: oklch(0.65 0.28 290 / 30%);
+
+  /* Text */
+  --color-text-primary: oklch(0.95 0.01 280);
+  --color-text-secondary: oklch(0.70 0.02 280);
+  --color-text-muted: oklch(0.50 0.02 280);
+
+  /* Border */
+  --color-border: oklch(1 0 0 / 8%);
+  --color-border-subtle: oklch(1 0 0 / 5%);
+
+  /* Status */
+  --color-success: oklch(0.72 0.20 145);
+  --color-warning: oklch(0.78 0.18 75);
+  --color-error: oklch(0.65 0.25 27);
+
+  /* Font */
+  --font-sans: "Geist", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+}
+
+/* Reset */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body, #root {
+  height: 100%;
+  overflow: hidden;
+  font-family: var(--font-sans);
+  background: var(--color-bg-base);
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  user-select: none;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: oklch(0.3 0.04 280);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.65 0.28 290 / 50%);
+}
+
+/* Draggable title bar region */
+.drag-region { -webkit-app-region: drag; }
+.no-drag { -webkit-app-region: no-drag; }
+
+/* Glass utility */
+.glass {
+  background: oklch(1 0 0 / 4%);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border);
+}
+
+.glass-hover {
+  transition: background 0.15s, border-color 0.15s;
+}
+.glass-hover:hover {
+  background: oklch(1 0 0 / 7%);
+  border-color: oklch(1 0 0 / 12%);
+}
+
+/* Neon glow */
+.neon-glow {
+  box-shadow: 0 0 16px oklch(0.65 0.28 290 / 25%),
+              0 0 32px oklch(0.65 0.28 290 / 10%);
+}
+
+.neon-border {
+  border-color: var(--color-neon-border) !important;
+  box-shadow: 0 0 8px oklch(0.65 0.28 290 / 15%);
+}
+
+/* Active sidebar indicator */
+.activity-active {
+  color: oklch(0.75 0.28 290);
+  background: oklch(0.65 0.28 290 / 12%);
+}
+.activity-active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2px;
+  height: 20px;
+  background: oklch(0.65 0.28 290);
+  border-radius: 0 2px 2px 0;
+  box-shadow: 0 0 6px oklch(0.65 0.28 290 / 80%);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideRight {
+  from { opacity: 0; transform: translateX(-6px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes bounce-dot {
+  0%, 80%, 100% { transform: scale(0.8); opacity: 0.4; }
+  40%           { transform: scale(1.2); opacity: 1; }
+}
+
+.fade-in    { animation: fadeIn    0.25s ease forwards; }
+.slide-in   { animation: slideRight 0.2s ease forwards; }
+
+/* Monaco editor override */
+.monaco-editor {
+  background: var(--color-bg-base) !important;
+}
