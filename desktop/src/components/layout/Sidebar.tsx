@@ -1,37 +1,65 @@
-import { useWorkspaceStore } from "@/store/workspace";
-import { ExplorerPanel } from "@/components/sidebar/ExplorerPanel";
-import { SearchPanel } from "@/components/sidebar/SearchPanel";
-import { GitPanel } from "@/components/sidebar/GitPanel";
-import { RunPanel } from "@/components/sidebar/RunPanel";
-import { ExtensionsPanel } from "@/components/sidebar/ExtensionsPanel";
-import { SettingsPanel } from "@/components/sidebar/SettingsPanel";
+import { memo } from "react";
+import { useUiStore } from "@/stores/ui";
+import { ExplorerPanel } from "@/features/explorer";
+import { SearchPanel } from "@/features/search";
+import { GitPanel } from "@/features/git";
+import { LAYOUT } from "@/lib/constants";
 
-const PANELS = {
-  explorer:   ExplorerPanel,
-  search:     SearchPanel,
-  git:        GitPanel,
-  run:        RunPanel,
+function RunPanel() {
+  return (
+    <div style={{ padding: 16, color: "oklch(0.45 0.01 280)", fontSize: 13, textAlign: "center" }}>
+      Run & Debug — coming soon
+    </div>
+  );
+}
+
+function ExtensionsPanel() {
+  return (
+    <div style={{ padding: 16, color: "oklch(0.45 0.01 280)", fontSize: 13, textAlign: "center" }}>
+      Extensions — coming soon
+    </div>
+  );
+}
+
+function SettingsPanel() {
+  return (
+    <div style={{ padding: 16, color: "oklch(0.45 0.01 280)", fontSize: 13 }}>
+      <p style={{ margin: "0 0 8px", fontWeight: 600, color: "oklch(0.65 0.01 280)" }}>Settings</p>
+      <p style={{ margin: 0, fontSize: 12 }}>Configuration panel coming soon.</p>
+    </div>
+  );
+}
+
+const PANELS: Record<string, React.ComponentType> = {
+  explorer: ExplorerPanel,
+  search: SearchPanel,
+  git: GitPanel,
+  run: RunPanel,
   extensions: ExtensionsPanel,
-  settings:   SettingsPanel,
+  settings: SettingsPanel,
 };
 
-export function Sidebar() {
-  const { sidebarView, sidebarOpen } = useWorkspaceStore();
+export const Sidebar = memo(function Sidebar() {
+  const { sidebarView, sidebarOpen } = useUiStore();
 
-  if (!sidebarOpen || sidebarView === "home") return null;
+  if (!sidebarOpen) return null;
 
-  const Panel = PANELS[sidebarView as keyof typeof PANELS];
+  const Panel = PANELS[sidebarView];
   if (!Panel) return null;
 
   return (
     <aside
-      className="w-60 h-full shrink-0 overflow-hidden slide-in flex flex-col"
       style={{
-        background: "oklch(0.10 0.02 280)",
-        borderRight: "1px solid oklch(1 0 0 / 6%)",
+        width: LAYOUT.SIDEBAR_WIDTH,
+        display: "flex",
+        flexDirection: "column",
+        flexShrink: 0,
+        background: "oklch(0.09 0.02 280)",
+        borderRight: "1px solid oklch(0.14 0.03 280)",
+        overflow: "hidden",
       }}
     >
       <Panel />
     </aside>
   );
-}
+});

@@ -1,10 +1,10 @@
-import { app, BrowserWindow, ipcMain, dialog, shell } from "electron";
+import { app, BrowserWindow, shell } from "electron";
 import * as path from "path";
-import * as fs from "fs";
+import { registerIpcHandlers, destroyAllTerminals } from "./ipc";
 
 const isDev = process.env.NODE_ENV === "development";
 
-function createWindow(): void {
+function createWindow(): BrowserWindow {
   const win = new BrowserWindow({
     width: 1400,
     height: 900,
@@ -29,90 +29,26 @@ function createWindow(): void {
     win.loadFile(path.join(__dirname, "../dist/index.html"));
   }
 
-  win.once("ready-to-show", () => {
-    win.show();
-  });
+  win.once("ready-to-show", () => win.show());
 
-  // Handle external links
   win.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);
     return { action: "deny" };
   });
+
+  return win;
 }
 
 app.whenReady().then(() => {
+  registerIpcHandlers();
   createWindow();
 
   app.on("activate", () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
-    }
+    if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
 });
 
 app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
-    app.quit();
-  }
-});
-
-// --- IPC Handlers ---
-
-// Window controls
-ipcMain.on("window:minimize", () => {
-  BrowserWindow.getFocusedWindow()?.minimize();
-});
-
-ipcMain.on("window:maximize", () => {
-  const win = BrowserWindow.getFocusedWindow();
-  if (win?.isMaximized()) {
-    win.unmaximize();
-  } else {
-    win?.maximize();
-  }
-});
-
-ipcMain.on("window:close", () => {
-  BrowserWindow.getFocusedWindow()?.close();
-});
-
-// File system
-ipcMain.handle("fs:openFolder", async () => {
-  const result = await dialog.showOpenDialog({
-    properties: ["openDirectory"],
-  });
-  if (!result.canceled && result.filePaths.length > 0) {
-    return result.filePaths[0];
-  }
-  return null;
-});
-
-ipcMain.handle("fs:readDir", (_event, dirPath: string) => {
-  try {
-    const entries = fs.readdirSync(dirPath, { withFileTypes: true });
-    return entries.map((e) => ({
-      name: e.name,
-      isDirectory: e.isDirectory(),
-      path: path.join(dirPath, e.name),
-    }));
-  } catch {
-    return [];
-  }
-});
-
-ipcMain.handle("fs:readFile", (_event, filePath: string) => {
-  try {
-    return fs.readFileSync(filePath, "utf-8");
-  } catch {
-    return null;
-  }
-});
-
-ipcMain.handle("fs:writeFile", (_event, filePath: string, content: string) => {
-  try {
-    fs.writeFileSync(filePath, content, "utf-8");
-    return true;
-  } catch {
-    return false;
-  }
+  destroyAllTerminals();
+  if (process.platform !== "darwin") app.quit();
 });

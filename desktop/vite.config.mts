@@ -14,8 +14,16 @@ export default defineConfig({
   build: {
     outDir: "dist",
     emptyOutDir: true,
+    chunkSizeWarningLimit: 800,
     rollupOptions: {
       external: ["electron"],
+      output: {
+        manualChunks: {
+          "monaco-editor": ["monaco-editor", "@monaco-editor/react"],
+          "xterm": ["@xterm/xterm", "@xterm/addon-fit", "@xterm/addon-web-links"],
+          "vendor": ["react", "react-dom", "zustand", "fuse.js"],
+        },
+      },
     },
   },
   server: {

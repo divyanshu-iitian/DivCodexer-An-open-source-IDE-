@@ -1,71 +1,75 @@
-import { Minus, Square, X, Zap } from "lucide-react";
-import { useWorkspaceStore } from "@/store/workspace";
+import { memo } from "react";
+import { useWorkspaceStore } from "@/stores/workspace";
+import { LAYOUT } from "@/lib/constants";
+import { basename } from "@/lib/utils";
 
-export function TitleBar() {
+export const TitleBar = memo(function TitleBar() {
   const { workspacePath } = useWorkspaceStore();
-  const folderName = workspacePath?.split(/[/\\]/).pop() ?? "DivCodexer";
 
-  function minimize() { window.electronAPI?.minimize(); }
-  function maximize() { window.electronAPI?.maximize(); }
-  function close()    { window.electronAPI?.close(); }
+  const btnBase: React.CSSProperties = {
+    width: 12,
+    height: 12,
+    borderRadius: "50%",
+    border: "none",
+    cursor: "pointer",
+    flexShrink: 0,
+    padding: 0,
+  };
 
   return (
     <div
-      className="drag-region flex items-center h-9 px-3 shrink-0 select-none"
-      style={{ background: "oklch(0.09 0.02 280)", borderBottom: "1px solid oklch(1 0 0 / 6%)" }}
+      style={{
+        height: LAYOUT.TITLE_BAR_HEIGHT,
+        display: "flex",
+        alignItems: "center",
+        background: "oklch(0.07 0.02 280)",
+        borderBottom: "1px solid oklch(0.14 0.03 280)",
+        userSelect: "none",
+        WebkitAppRegion: "drag" as React.CSSProperties["WebkitAppRegion"],
+        paddingLeft: 12,
+        paddingRight: 12,
+        flexShrink: 0,
+        gap: 8,
+      }}
     >
-      {/* Brand */}
-      <div className="no-drag flex items-center gap-1.5 mr-4">
-        <Zap className="w-3.5 h-3.5" style={{ color: "oklch(0.75 0.28 290)" }} />
-        <span
-          className="text-xs font-bold tracking-wide"
-          style={{ color: "oklch(0.75 0.28 290)" }}
-        >
-          DivCodexer
-        </span>
+      <div
+        style={{
+          display: "flex",
+          gap: 6,
+          WebkitAppRegion: "no-drag" as React.CSSProperties["WebkitAppRegion"],
+          flexShrink: 0,
+        }}
+      >
+        <button
+          style={{ ...btnBase, background: "#ff5f57" }}
+          onClick={() => window.electronAPI.close()}
+          title="Close"
+        />
+        <button
+          style={{ ...btnBase, background: "#febc2e" }}
+          onClick={() => window.electronAPI.minimize()}
+          title="Minimize"
+        />
+        <button
+          style={{ ...btnBase, background: "#28c840" }}
+          onClick={() => window.electronAPI.maximize()}
+          title="Maximize"
+        />
       </div>
 
-      {/* Current folder */}
-      <span className="text-xs" style={{ color: "oklch(0.55 0.02 280)" }}>
-        {folderName}
-      </span>
-
-      {/* Spacer */}
-      <div className="flex-1" />
-
-      {/* Window controls */}
-      <div className="no-drag flex items-center gap-1">
-        <button
-          onClick={minimize}
-          className="flex items-center justify-center w-7 h-6 rounded transition-colors"
-          style={{ color: "oklch(0.55 0.02 280)" }}
-          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "oklch(1 0 0 / 8%)"; (e.currentTarget as HTMLElement).style.color = "oklch(0.85 0.01 280)"; }}
-          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "transparent"; (e.currentTarget as HTMLElement).style.color = "oklch(0.55 0.02 280)"; }}
-          title="Minimize"
-        >
-          <Minus className="w-3.5 h-3.5" />
-        </button>
-        <button
-          onClick={maximize}
-          className="flex items-center justify-center w-7 h-6 rounded transition-colors"
-          style={{ color: "oklch(0.55 0.02 280)" }}
-          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "oklch(1 0 0 / 8%)"; (e.currentTarget as HTMLElement).style.color = "oklch(0.85 0.01 280)"; }}
-          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "transparent"; (e.currentTarget as HTMLElement).style.color = "oklch(0.55 0.02 280)"; }}
-          title="Maximize"
-        >
-          <Square className="w-3.5 h-3.5" />
-        </button>
-        <button
-          onClick={close}
-          className="flex items-center justify-center w-7 h-6 rounded transition-colors"
-          style={{ color: "oklch(0.55 0.02 280)" }}
-          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "oklch(0.65 0.25 27 / 80%)"; (e.currentTarget as HTMLElement).style.color = "white"; }}
-          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "transparent"; (e.currentTarget as HTMLElement).style.color = "oklch(0.55 0.02 280)"; }}
-          title="Close"
-        >
-          <X className="w-3.5 h-3.5" />
-        </button>
+      <div
+        style={{
+          flex: 1,
+          textAlign: "center",
+          fontSize: 12,
+          color: "oklch(0.45 0.01 280)",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+        }}
+      >
+        {workspacePath ? `${basename(workspacePath)} — DivCodexer` : "DivCodexer — AI IDE"}
       </div>
     </div>
   );
-}
+});
